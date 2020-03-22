@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { TextInput, View } from 'react-native';
 
 export default class ItemAdder extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            text: '',
-        };
-    }
+    text = '';
+
+    // Create a reference to pass to the input field so it can be accessed later
+    inputRef = createRef(null);
 
     updateText = newText => {
-        this.setState({ text: newText });
+        this.text = newText;
     };
 
     submit = () => {
         const { addItem } = this.props;
-        const { text } = this.state;
 
-        addItem(text);
+        // If this element is in the DOM, get it and clear its contents
+        if (this.inputRef) {
+            this.inputRef.current.clear();
+        }
+
+        addItem(this.text);
     };
 
     render() {
@@ -29,8 +31,12 @@ export default class ItemAdder extends React.Component {
                 }}
             >
                 <TextInput
+                    ref={this.inputRef}
                     onChangeText={this.updateText}
                     onSubmitEditing={this.submit}
+                    clearButtonMode="always"
+                    placeholder="New todo-item"
+                    enablesReturnKeyAutomatically
                     style={{
                         backgroundColor: 'white',
                         fontSize: 20,
