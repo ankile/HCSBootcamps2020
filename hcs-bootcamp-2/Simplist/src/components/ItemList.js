@@ -1,23 +1,24 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { View } from 'react-native';
 import Item from './Item';
 
 export default class ItemList extends React.Component {
     render() {
-        const { todos } = this.props;
+        const { todos, removeItem, toggleChecked } = this.props;
         return (
-            <ScrollView
-                style={{
-                    width: '100%',
-                    height: 40,
-                    backgroundColor: 'lightblue',
-                    borderRadius: 5,
-                }}
-            >
+            <View>
                 {todos.map(todo => {
-                    return <Item key={todo} text={todo} />;
+                    return (
+                        <Item
+                            key={todo.id}
+                            text={todo.text}
+                            checked={todo.completed}
+                            removeItem={() => removeItem(todo.id)}
+                            toggleChecked={() => toggleChecked(todo.id)}
+                        />
+                    );
                 })}
-            </ScrollView>
+            </View>
         );
     }
 }

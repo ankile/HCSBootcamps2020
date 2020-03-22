@@ -38,10 +38,12 @@ export default class ItemAdder extends React.Component {
                     placeholder="New todo-item"
                     enablesReturnKeyAutomatically
                     style={{
-                        backgroundColor: 'white',
+                        backgroundColor: '#fff',
                         fontSize: 20,
                         padding: 8,
                         borderRadius: 5,
+                        borderColor: '#006494',
+                        borderWidth: 1,
                     }}
                 />
             </View>
