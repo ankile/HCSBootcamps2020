@@ -21,10 +21,3 @@ export default class ItemList extends React.Component {
         );
     }
 }
-
-
-
-# returns (d,1) the gradient of llc_obj(X, y, th, th0) with respect to th
-def d_llc_obj_th(X, y, th, th0, lam):
-    #return (2*lam*np.linalg.norm(th)) * d_nll_loss_th(X, y, th, th0)
-    return d_nll_loss_th(X, y, th, th0)
