@@ -38,7 +38,7 @@ export default class HomeScreen extends React.Component {
     };
 
     render() {
-        const { todos } = this.state;
+        const { todos, hideComplete } = this.state;
         const complete = todos.filter(t => t.completed);
         const incomplete = todos.filter(t => !t.completed);
 
@@ -70,17 +70,63 @@ export default class HomeScreen extends React.Component {
                         marginHorizontal: -5,
                     }}
                 >
-                    <ItemList
-                        todos={incomplete}
-                        removeItem={this.removeItem}
-                        toggleChecked={this.toggleChecked}
-                    />
-                    <Text>Completed Items:</Text>
-                    <ItemList
-                        todos={complete}
-                        removeItem={this.removeItem}
-                        toggleChecked={this.toggleChecked}
-                    />
+                    {incomplete.length === 0 ? (
+                        <View
+                            style={{
+                                flex: 1,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: '#fff',
+                                padding: 10,
+                                margin: 5,
+                                borderRadius: 5,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: 18,
+                                    textAlign: 'center',
+                                }}
+                            >
+                                Nothing Left To Do!
+                            </Text>
+                        </View>
+                    ) : (
+                        <ItemList
+                            todos={incomplete}
+                            removeItem={this.removeItem}
+                            toggleChecked={this.toggleChecked}
+                        />
+                    )}
+                    {complete.length > 0 && (
+                        <View
+                            style={{
+                                marginTop: 15,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: 18,
+                                }}
+                                onPress={() =>
+                                    this.setState({
+                                        hideComplete: !hideComplete,
+                                    })
+                                }
+                            >
+                                Completed Items (
+                                {hideComplete ? 'show' : 'hide'}):
+                            </Text>
+                            {!hideComplete && (
+                                <ItemList
+                                    todos={complete}
+                                    removeItem={this.removeItem}
+                                    toggleChecked={this.toggleChecked}
+                                />
+                            )}
+                        </View>
+                    )}
                 </ScrollView>
             </View>
         );
