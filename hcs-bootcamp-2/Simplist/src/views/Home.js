@@ -7,40 +7,81 @@ export default class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            todos: [],
+            incomplete: [
+                {
+                    id: 1,
+                    text: 'Todo 1',
+                    complete: false,
+                },
+
+                {
+                    id: 2,
+                    text: 'Todo 2',
+                    complete: false,
+                },
+                {
+                    id: 3,
+                    text: 'Todo 3',
+                    complete: false,
+                },
+            ],
+            complete: [],
         };
     }
 
     addItem = itemText => {
-        const { todos } = this.state;
+        const { incomplete } = this.state;
         this.setState({
-            todos: [
-                ...todos,
+            incomplete: [
+                ...incomplete,
                 { id: itemText, text: itemText, completed: false },
             ],
         });
     };
 
     removeItem = itemId => {
-        const { todos } = this.state;
-
-        this.setState({ todos: todos.filter(i => i.id !== itemId) });
-    };
-
-    toggleChecked = itemId => {
-        const { todos } = this.state;
+        const { incomplete, complete } = this.state;
 
         this.setState({
-            todos: todos.map(t =>
-                t.id === itemId ? { ...t, completed: !t.completed } : t
-            ),
+            incomplete: incomplete.filter(i => i.id !== itemId),
+            complete: complete.filter(i => i.id !== itemId),
+        });
+    };
+
+    toggleChecked = item => {
+        const { incomplete, complete } = this.state;
+
+        item = { ...item, completed: !item.completed };
+        if (item.completed) {
+            this.setState({
+                complete: [...complete, item],
+                incomplete: incomplete.filter(t => t.id !== item.id),
+            });
+        } else {
+            this.setState({
+                incomplete: [...incomplete, item],
+                complete: complete.filter(t => t.id !== item.id),
+            });
+        }
+    };
+
+    moveItem = (item, direction) => {
+        const { incomplete, complete } = this.state;
+        let arr = item.completed ? complete : incomplete;
+        let newArr = Array.from(arr);
+        let index = newArr.findIndex(t => t.id === item.id);
+
+        let temp = newArr[index];
+        newArr[index] = newArr[index + direction];
+        newArr[index + direction] = temp;
+
+        this.setState({
+            [item.completed ? 'complete' : 'incomplete']: newArr,
         });
     };
 
     render() {
-        const { todos, hideComplete } = this.state;
-        const complete = todos.filter(t => t.completed);
-        const incomplete = todos.filter(t => !t.completed);
+        const { complete, incomplete, hideComplete } = this.state;
 
         return (
             <View
@@ -97,6 +138,7 @@ export default class HomeScreen extends React.Component {
                             todos={incomplete}
                             removeItem={this.removeItem}
                             toggleChecked={this.toggleChecked}
+                            moveItem={this.moveItem}
                         />
                     )}
                     {complete.length > 0 && (
@@ -123,6 +165,7 @@ export default class HomeScreen extends React.Component {
                                     todos={complete}
                                     removeItem={this.removeItem}
                                     toggleChecked={this.toggleChecked}
+                                    moveItem={this.moveItem}
                                 />
                             )}
                         </View>

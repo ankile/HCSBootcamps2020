@@ -4,7 +4,15 @@ import { CheckBox, Icon } from 'react-native-elements';
 
 export default class Item extends React.Component {
     render() {
-        const { text, checked, removeItem, toggleChecked } = this.props;
+        const {
+            text,
+            checked,
+            removeItem,
+            toggleChecked,
+            index,
+            listLength,
+            moveItem,
+        } = this.props;
         return (
             <View
                 style={{
@@ -40,6 +48,32 @@ export default class Item extends React.Component {
                 >
                     {text}
                 </Text>
+                {index !== listLength - 1 && (
+                    <Icon
+                        name="arrow-downward"
+                        containerStyle={{
+                            position: 'absolute',
+                            right: 65,
+                            // borderWidth: 1,
+                            padding: 3,
+                        }}
+                        onPress={() => moveItem(1)}
+                        color="#FFF"
+                    />
+                )}
+                {index !== 0 && (
+                    <Icon
+                        name="arrow-upward"
+                        containerStyle={{
+                            position: 'absolute',
+                            right: 40,
+                            // borderWidth: 1,
+                            padding: 3,
+                        }}
+                        onPress={() => moveItem(-1)}
+                        color="#FFF"
+                    />
+                )}
                 <Icon
                     name="clear"
                     containerStyle={{
