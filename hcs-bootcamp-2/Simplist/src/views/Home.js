@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import { View, ScrollView, Text, AsyncStorage } from 'react-native';
 import ItemList from '../components/ItemList';
 import ItemAdder from '../components/ItemAdder';
 
@@ -7,45 +7,69 @@ export default class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            incomplete: [
-                {
-                    id: 1,
-                    text: 'Todo 1',
-                    complete: false,
-                },
-
-                {
-                    id: 2,
-                    text: 'Todo 2',
-                    complete: false,
-                },
-                {
-                    id: 3,
-                    text: 'Todo 3',
-                    complete: false,
-                },
-            ],
+            incomplete: [],
             complete: [],
         };
     }
 
+    componentDidMount() {
+        // Fetch saved data
+        this.fetchData();
+    }
+
+    fetchData = async () => {
+        try {
+            const [[, complete], [, incomplete]] = await AsyncStorage.multiGet([
+                'complete',
+                'incomplete',
+            ]);
+
+            this.setState({
+                complete: complete ? JSON.parse(complete) : [],
+                incomplete: incomplete ? JSON.parse(incomplete) : [],
+            });
+        } catch (e) {
+            // Handle dat error
+            console.log(e);
+        }
+    };
+
+    storeData = async () => {
+        const { complete, incomplete } = this.state;
+        try {
+            await AsyncStorage.multiSet([
+                ['complete', JSON.stringify(complete)],
+                ['incomplete', JSON.stringify(incomplete)],
+            ]);
+        } catch (e) {
+            // State of the art error handling
+            console.log(e);
+        }
+    };
+
     addItem = itemText => {
         const { incomplete } = this.state;
-        this.setState({
-            incomplete: [
-                ...incomplete,
-                { id: itemText, text: itemText, completed: false },
-            ],
-        });
+        this.setState(
+            {
+                incomplete: [
+                    ...incomplete,
+                    { id: itemText, text: itemText, completed: false },
+                ],
+            },
+            this.storeData
+        );
     };
 
     removeItem = itemId => {
         const { incomplete, complete } = this.state;
 
-        this.setState({
-            incomplete: incomplete.filter(i => i.id !== itemId),
-            complete: complete.filter(i => i.id !== itemId),
-        });
+        this.setState(
+            {
+                incomplete: incomplete.filter(i => i.id !== itemId),
+                complete: complete.filter(i => i.id !== itemId),
+            },
+            this.storeData
+        );
     };
 
     toggleChecked = item => {
@@ -53,15 +77,21 @@ export default class HomeScreen extends React.Component {
 
         item = { ...item, completed: !item.completed };
         if (item.completed) {
-            this.setState({
-                complete: [...complete, item],
-                incomplete: incomplete.filter(t => t.id !== item.id),
-            });
+            this.setState(
+                {
+                    complete: [...complete, item],
+                    incomplete: incomplete.filter(t => t.id !== item.id),
+                },
+                this.storeData
+            );
         } else {
-            this.setState({
-                incomplete: [...incomplete, item],
-                complete: complete.filter(t => t.id !== item.id),
-            });
+            this.setState(
+                {
+                    incomplete: [...incomplete, item],
+                    complete: complete.filter(t => t.id !== item.id),
+                },
+                this.storeData
+            );
         }
     };
 
@@ -75,9 +105,12 @@ export default class HomeScreen extends React.Component {
         newArr[index] = newArr[index + direction];
         newArr[index + direction] = temp;
 
-        this.setState({
-            [item.completed ? 'complete' : 'incomplete']: newArr,
-        });
+        this.setState(
+            {
+                [item.completed ? 'complete' : 'incomplete']: newArr,
+            },
+            this.storeData
+        );
     };
 
     render() {
